@@ -6,7 +6,7 @@ This is where I ask and answer questions about [Volcanoes](https://simondorfman.
 
 ### Which of these four rules seems to make the game the most balanced?:
 
-(And by balanced, I mean less likely to give the first player or the second player advantage.)
+(And by balanced, I mean: less likely to give either the first or the second player an advantage over the other.)
 
 1. Award tie games to the player that played the last turn.
 2. Award tie games to the player that did not play the last turn.
