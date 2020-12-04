@@ -212,36 +212,95 @@ datasummary_skim(df, type="categorical")
 ### Add some calculated columns
 
 ```{r}
+#create a function to calculate which player played the turn before the end of the game
+total_moves_to_player_who_played_turn_before_last <- function(total_moves) {
+  total_moves_minus_one_divided_by_six_remainder <- (total_moves - 1) %% 6
+  if (total_moves_minus_one_divided_by_six_remainder %in% c(1,5)) {
+    return("One")
+  } else if (total_moves_minus_one_divided_by_six_remainder %in% c(2,4)) {
+    return("Two")
+  } else if (total_moves_minus_one_divided_by_six_remainder %in% c(0,3)) {
+    return("Growth")
+  } else {
+    return("Empty")
+  }
+}
+
 #add column called which_player_played_turn_before_game_end
-# Translate this C# code to R so I can figure out whose turn went before game-end:
-#         private Player GetPlayerForTurn(int turn)
-#         {
-#             switch ((turn - 1) % 6)
-#             {
-#                 case 0:
-#                 case 4:
-#                 case 5:
-#                     return Player.One;
-#                 case 1:
-#                 case 2:
-#                 case 3:
-#                     return Player.Two;
-#                 default:
-#                     return Player.Empty;
-#             }
-#         }
+df <- df %>%
+  rowwise() %>%
+  mutate(which_player_played_turn_before_game_end = total_moves_to_player_who_played_turn_before_last(total_moves))
+
 
 # create column called winner_case_1 for this:
 # 1. Award tie games to the player that played the last turn.
+#if winner = Draw, winner = which_player_played_turn_before_game_end
+#else winner = winner
 
 # create column called winner_case_2 for this:
 # 2. Award tie games to the player that did not play the last turn.
+#if winner = Draw, winner = function opposite player than which_player_played_turn_before_game_end
+#else winner = winner
 
 # create column called winner_case_3 for this:
 # 3. Award tie games to the first player.
+#if winner = Draw, winner = One
+#else winner = winner
 
 # create column called winner_case_4 for this:
 # 4. Award tie games to the second player.
+#if winner = Draw, winner = Two
+#else winner = winner
+
+# next, show how far each of these is from 50/50
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#delete below, or use it for further analysis questions
+
+
+
+
+#create a function to calculate which player played the turn before the end of the game
+# total_moves_to_player_who_played_last_turn <- function(total_moves) {
+#   total_moves_divided_by_six_remainder <- (total_moves) %% 6
+#   if (total_moves_divided_by_six_remainder %in% c(1,5)) {
+#     return("One")
+#   } else if (total_moves_divided_by_six_remainder %in% c(2,4)) {
+#     return("Two")
+#   } else if (total_moves_divided_by_six_remainder %in% c(0,3)) {
+#     return("Growth")
+#   } else {
+#     return("Empty")
+#   }
+# }
+
+#add column called which_player_played_the_last_turn
+# df_test <- df_test %>%
+#   rowwise() %>%
+#   mutate(which_player_played_the_last_turn = total_moves_to_player_who_played_last_turn(total_moves))
+
+#look at first 2000 rows in datatable
+# datatable(df_test[1:2000,], filter = 'top', options = list(
+#   pageLength = 5,
+#   autoWidth = TRUE,
+#   class = "cell-border stripe",
+#   rownames = FALSE,
+#   order = list(list(9, "asc"), list(12, "asc"))
+# ))
 
 ```
 

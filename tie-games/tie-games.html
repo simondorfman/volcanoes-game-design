@@ -1316,36 +1316,95 @@ Normal
 </div>
 <div id="add-some-calculated-columns" class="section level3">
 <h3>Add some calculated columns</h3>
-<pre class="r"><code>#add column called which_player_played_turn_before_game_end
-# Translate this C# code to R so I can figure out whose turn went before game-end:
-#         private Player GetPlayerForTurn(int turn)
-#         {
-#             switch ((turn - 1) % 6)
-#             {
-#                 case 0:
-#                 case 4:
-#                 case 5:
-#                     return Player.One;
-#                 case 1:
-#                 case 2:
-#                 case 3:
-#                     return Player.Two;
-#                 default:
-#                     return Player.Empty;
-#             }
-#         }
+<pre class="r"><code>#create a function to calculate which player played the turn before the end of the game
+total_moves_to_player_who_played_turn_before_last &lt;- function(total_moves) {
+  total_moves_minus_one_divided_by_six_remainder &lt;- (total_moves - 1) %% 6
+  if (total_moves_minus_one_divided_by_six_remainder %in% c(1,5)) {
+    return(&quot;One&quot;)
+  } else if (total_moves_minus_one_divided_by_six_remainder %in% c(2,4)) {
+    return(&quot;Two&quot;)
+  } else if (total_moves_minus_one_divided_by_six_remainder %in% c(0,3)) {
+    return(&quot;Growth&quot;)
+  } else {
+    return(&quot;Empty&quot;)
+  }
+}
+
+#add column called which_player_played_turn_before_game_end
+df &lt;- df %&gt;%
+  rowwise() %&gt;%
+  mutate(which_player_played_turn_before_game_end = total_moves_to_player_who_played_turn_before_last(total_moves))
+
 
 # create column called winner_case_1 for this:
 # 1. Award tie games to the player that played the last turn.
+#if winner = Draw, winner = which_player_played_turn_before_game_end
+#else winner = winner
 
 # create column called winner_case_2 for this:
 # 2. Award tie games to the player that did not play the last turn.
+#if winner = Draw, winner = function opposite player than which_player_played_turn_before_game_end
+#else winner = winner
 
 # create column called winner_case_3 for this:
 # 3. Award tie games to the first player.
+#if winner = Draw, winner = One
+#else winner = winner
 
 # create column called winner_case_4 for this:
-# 4. Award tie games to the second player.</code></pre>
+# 4. Award tie games to the second player.
+#if winner = Draw, winner = Two
+#else winner = winner
+
+# next, show how far each of these is from 50/50
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#delete below, or use it for further analysis questions
+
+
+
+
+#create a function to calculate which player played the turn before the end of the game
+# total_moves_to_player_who_played_last_turn &lt;- function(total_moves) {
+#   total_moves_divided_by_six_remainder &lt;- (total_moves) %% 6
+#   if (total_moves_divided_by_six_remainder %in% c(1,5)) {
+#     return(&quot;One&quot;)
+#   } else if (total_moves_divided_by_six_remainder %in% c(2,4)) {
+#     return(&quot;Two&quot;)
+#   } else if (total_moves_divided_by_six_remainder %in% c(0,3)) {
+#     return(&quot;Growth&quot;)
+#   } else {
+#     return(&quot;Empty&quot;)
+#   }
+# }
+
+#add column called which_player_played_the_last_turn
+# df_test &lt;- df_test %&gt;%
+#   rowwise() %&gt;%
+#   mutate(which_player_played_the_last_turn = total_moves_to_player_who_played_last_turn(total_moves))
+
+#look at first 2000 rows in datatable
+# datatable(df_test[1:2000,], filter = &#39;top&#39;, options = list(
+#   pageLength = 5,
+#   autoWidth = TRUE,
+#   class = &quot;cell-border stripe&quot;,
+#   rownames = FALSE,
+#   order = list(list(9, &quot;asc&quot;), list(12, &quot;asc&quot;))
+# ))</code></pre>
 </div>
 </div>
 </div>
