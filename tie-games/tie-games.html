@@ -877,7 +877,8 @@ df &lt;-
 
 #clean up column names
 df &lt;- clean_names(df)</code></pre>
-<p>Our dataframe currently looks like this:</p>
+<div id="our-dataframe-currently-looks-like-this" class="section level4">
+<h4>Our dataframe currently looks like this:</h4>
 <pre class="r"><code>kable(df[1:3, ])</code></pre>
 <table>
 <colgroup>
@@ -950,7 +951,9 @@ df &lt;- clean_names(df)</code></pre>
 </tr>
 </tbody>
 </table>
-<p>And a summary looks like this:</p>
+</div>
+<div id="and-a-summary-looks-like-this" class="section level4">
+<h4>And a summary looks like this:</h4>
 <pre class="r"><code>datasummary_skim(df)</code></pre>
 <table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
@@ -1314,16 +1317,17 @@ Normal
 </tbody>
 </table>
 </div>
-<div id="add-some-calculated-columns" class="section level3">
-<h3>Add some calculated columns</h3>
+</div>
+<div id="add-some-calculated-columns-to-get-the-answers" class="section level3">
+<h3>Add some calculated columns to get the answers</h3>
 <pre class="r"><code>#create a function to calculate which player played the turn before the end of the game
 total_moves_to_player_who_played_turn_before_last &lt;- function(total_moves) {
   total_moves_minus_one_divided_by_six_remainder &lt;- (total_moves - 1) %% 6
-  if (total_moves_minus_one_divided_by_six_remainder %in% c(1,5)) {
+  if (total_moves_minus_one_divided_by_six_remainder %in% c(1,5)) { # remainder of 1 or 5, player One
     return(&quot;One&quot;)
-  } else if (total_moves_minus_one_divided_by_six_remainder %in% c(2,4)) {
+  } else if (total_moves_minus_one_divided_by_six_remainder %in% c(2,4)) { # remainder of 2 or 4, player Two
     return(&quot;Two&quot;)
-  } else if (total_moves_minus_one_divided_by_six_remainder %in% c(0,3)) {
+  } else if (total_moves_minus_one_divided_by_six_remainder %in% c(0,3)) { # remainder of 0 or 3, Growth turn
     return(&quot;Growth&quot;)
   } else {
     return(&quot;Empty&quot;)
@@ -1340,31 +1344,51 @@ df &lt;- df %&gt;%
 # 1. Award tie games to the player that played the last turn.
 #if winner = Draw, winner = which_player_played_turn_before_game_end
 #else winner = winner
+df &lt;- df %&gt;%
+  mutate(winner_case_1 = ifelse(winner == &quot;Draw&quot;, which_player_played_turn_before_game_end, winner))
 
 # create column called winner_case_2 for this:
 # 2. Award tie games to the player that did not play the last turn.
 #if winner = Draw, winner = function opposite player than which_player_played_turn_before_game_end
 #else winner = winner
+df &lt;- df %&gt;%
+  mutate(winner_case_2 = ifelse(winner == &quot;Draw&quot;, ifelse(which_player_played_turn_before_game_end == &quot;One&quot;, &quot;Two&quot;, &quot;One&quot;), winner))
+  # mutate(winner_case_2 = ifelse(which_player_played_turn_before_game_end = &quot;One&quot;, &quot;Two&quot;, &quot;One&quot;))
 
 # create column called winner_case_3 for this:
 # 3. Award tie games to the first player.
 #if winner = Draw, winner = One
 #else winner = winner
+df &lt;- df %&gt;%
+  mutate(winner_case_3 = ifelse(winner == &quot;Draw&quot;, &quot;One&quot;, winner))
 
 # create column called winner_case_4 for this:
 # 4. Award tie games to the second player.
 #if winner = Draw, winner = Two
 #else winner = winner
+df &lt;- df %&gt;%
+  mutate(winner_case_4 = ifelse(winner == &quot;Draw&quot;, &quot;Two&quot;, winner))
+
+
+#write to file
+write_csv(df, &quot;df_with_calculated_columns.csv&quot;, na = &quot;NA&quot;, append = FALSE, col_names = TRUE, quote_escape = &quot;double&quot;)
+
+
+
 
 # next, show how far each of these is from 50/50
 
 
+# or, try showing how far each of them is from the ratio with draw games excluded.
 
 
 
 
 
 
+
+#graph games with the most draws, maybe group by players, or try other factors
+#maybe the next experiment is to test this again with the stronger newer AIs
 
 
 
