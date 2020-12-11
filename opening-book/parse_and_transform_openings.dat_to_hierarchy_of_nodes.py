@@ -41,37 +41,48 @@ Created on Wed Dec  9 11:15:12 2020
 #
 ################################################################################
 
-#coding todo draft:
-
-#open openings.dat file
+#import packages
 from pathlib import Path
+from pandas import DataFrame
+
+#open openings.dat file and convert each line into an item in a list
 filename = Path("data/openings.dat")
 with open(filename.absolute()) as myfile:
-    head = [next(myfile) for x in range(3)]
-print(head)
+    openings_list = list(myfile)
 
-#concatonate top 3 lines with underscore delimiter and "df_openingsdat_" at front
-#store this in a variable to use as the name of a dataframe we create later, or just create an empty dataframe right now
-#e.g.
-# 7
-# 12643
-# 600
-#...becomes:
-# df_openingsdat_7_12643_600
+#remove linebreaks
+for i in range(len(openings_list)):
+    item = openings_list[i]
+    openings_list[i] = item.strip()
 
-#delete top 3 lines
+#remove first 3 items
+_, _, _, *openings_list = openings_list
 
-#for all odd lines, add to the end of the line, concatonate space + the line below them
+#concatonate pairs of items with a space between them
 #e.g.
 # N07 N26 G S10 S35 G
 # S39
 #...becomes:
 # N07 N26 G S10 S35 G S39
+openings_list = [openings_list[i] + " " + openings_list[i+1] for i in range(0, len(openings_list)-1, 2)]
 
-#delete all even lines
+#create dataframe from openings_list as column called "node"
+df = DataFrame (openings_list,columns=["node"])
 
-#add the remain lines (all the odd lines) to the dataframe in the first column called nodes
-#trim all the lines so there is no whitespace on either side
+#create column called count_of_spaces_in_node
+def countSpaces(cell):
+    try:
+        return cell.count(" ")
+    except:
+        return 0
+df["count_of_spaces_in_node"] = df["node"].apply(countSpaces)
+
+
+
+
+
+
+
 
 #figure out how to find the "child" nodes and add them to a second/third/etc. columns, do some sort of regex match?
 #look at current row, if any other matching the first x characters in the same position, it's a child
