@@ -43,7 +43,7 @@ Created on Wed Dec  9 11:15:12 2020
 
 #import packages
 from pathlib import Path
-from pandas import DataFrame
+import pandas as pd
 
 #open openings.dat file and convert each line into an item in a list
 filename = Path("data/openings.dat")
@@ -67,7 +67,10 @@ _, _, _, *openings_list = openings_list
 openings_list = [openings_list[i] + " " + openings_list[i+1] for i in range(0, len(openings_list)-1, 2)]
 
 #create dataframe from openings_list as column called "node"
-df = DataFrame (openings_list,columns=["node"])
+df = pd.DataFrame (openings_list,columns=["node"])
+
+#remove spaces from beginning and end of node cells
+df["node"] = df["node"].str.strip()
 
 #create column called count_of_spaces_in_node
 def countSpaces(cell):
@@ -77,11 +80,23 @@ def countSpaces(cell):
         return 0
 df["count_of_spaces_in_node"] = df["node"].apply(countSpaces)
 
+#sort by count_of_spaces_in_node, then by node
+df = df.sort_values(by=["count_of_spaces_in_node", "node"])
 
+#reset index
+df = df.reset_index(drop=True)
 
+#what are the unique values in count_of_spaces_in_node?
+#df.count_of_spaces_in_node.unique()
+#Out[33]: array([0, 1, 3, 4, 6], dtype=int64)
 
-
-
+def findChildren(cell,count_of_spaces_in_node):
+    return(cell) #todo: insert correct logic, google window functions with python
+    #for current cell, look at window of cells: WHERE count_of_spaces_in_node < window(count_of_spaces_in_node)
+        #if window(node) == left(node,length(window(node)))
+            #return(window(node))
+# df['child_nodes'] = df.apply(lambda x: findChildren(x.nodes, x.count_of_spaces_in_node), axis=1)
+df["child_nodes"] = (df.apply(lambda x: findChildren(x[x.index[0]], x[x.index[1]]), axis=1)) 
 
 
 #figure out how to find the "child" nodes and add them to a second/third/etc. columns, do some sort of regex match?
