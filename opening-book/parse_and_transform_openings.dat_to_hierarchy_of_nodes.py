@@ -44,6 +44,7 @@ Created on Wed Dec  9 11:15:12 2020
 #import packages
 from pathlib import Path
 import pandas as pd
+import numpy as np
 
 #open openings.dat file and convert each line into an item in a list
 filename = Path("data/openings.dat")
@@ -87,28 +88,39 @@ df = df.sort_values(by=["count_of_spaces_in_node", "node"])
 df = df.reset_index(drop=True)
 
 #what are the unique values in count_of_spaces_in_node?
-#df.count_of_spaces_in_node.unique()
-#Out[33]: array([0, 1, 3, 4, 6], dtype=int64)
+hierarchy_distinct_count_of_spaces_in_node = df.count_of_spaces_in_node.unique()
 
-def findChildren(cell,count_of_spaces_in_node):
-    return(cell) #todo: insert correct logic, google window functions with python
-    #for current cell, look at window of cells: WHERE count_of_spaces_in_node < window(count_of_spaces_in_node)
-        #if window(node) == left(node,length(window(node)))
-            #return(window(node))
-# df['child_nodes'] = df.apply(lambda x: findChildren(x.nodes, x.count_of_spaces_in_node), axis=1)
-df["child_nodes"] = (df.apply(lambda x: findChildren(x[x.index[0]], x[x.index[1]]), axis=1)) 
+#create column called length_of_node
+df['length_of_node']  = df['node'].str.len()
 
 
-#figure out how to find the "child" nodes and add them to a second/third/etc. columns, do some sort of regex match?
-#look at current row, if any other matching the first x characters in the same position, it's a child
+#create parent_node column
+#( thanks to help from Saravanakumar V here: https://stackoverflow.com/a/65334898/279659 )
+node_list = [i.split() for i in df["node"]]
+def findParentNode(x):
+    lis = x.split(" ")
+    for i in range(-1,-len(lis),-1):
+        if (lis[:i] in node_list):
+            return " ".join(lis[:i])
+    return np.nan
+df["parent_node"] = df["node"].apply(findParentNode)
 
-#idea: add a column with the length of each string. if the length is less than the current row, then try to match that many characters
+#now get the data into .csv format for viz in R
+#create a df ready to use as nodes.csv
 
-#use this dataframe of parent/child relationships to generate some sort of tree visualization
-#maybe try a python package for the viz like this one:
-    #https://pyvis.readthedocs.io/en/latest/tutorial.html
-#or rexport to .csv and do the viz in R
-#if we do it in R, all this python code could go in an Rmarkdown code block maybe
 
-#maybe when doing the viz, only include nodes that have parent-child relationships, so it doesn't get too large
-#show a count of nodes without parent-child relationships to get an idea of what they're useful for
+
+#save df_nodes to csv
+# df_nodes.to_csv(r'data/nodes.csv', index = False)
+
+#idea: remove nodes without parent nodes, but consider replacing them with one node showing how many nodes don't have parent nodes
+
+
+
+#create a df ready to use as edges.csv
+
+#idea
+
+
+#save df_edges to csv
+# df_edges.to_csv(r'data/edges.csv', index = False)
